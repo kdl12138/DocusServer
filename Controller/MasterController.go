@@ -1,9 +1,12 @@
 package Controller
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"git.docus.tech/kdl12138/DocusServer/Api"
 	"git.docus.tech/kdl12138/DocusServer/Model"
+	"git.docus.tech/kdl12138/DocusServer/Storage"
 	"git.docus.tech/kdl12138/DocusServer/Template"
 	"html/template"
 	"io/ioutil"
@@ -52,44 +55,75 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Update complete")
 }
 func Read(w http.ResponseWriter, r *http.Request){
-	var getMessage Template.GetMessage
-	con, err := ioutil.ReadAll(r.Body)
-	if err != nil {
+	if !Api.CheckWhite(r.RemoteAddr) {
 		// TODO log
-	}
-	str := string(con)
-	if err := json.Unmarshal([]byte(str), &getMessage); err != nil {
-		// TODO log
-	}
-	// TODO find cache
-	getData, err:= Model.Find(getMessage.Uuid)
-	data := Template.Data{
+	} else {
+		var getMessage Template.GetMessage
+		con, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			// TODO log
+		}
+		str := string(con)
+		if err := json.Unmarshal([]byte(str), &getMessage); err != nil {
+			// TODO log
+		}
+		// TODO find cache
+		getData, err:= Model.Find(getMessage.Uuid)
+		data := Template.Data{
 
+		}
+		if err != nil {
+			// TODO log
+		}
+		jsonData, _ := json.Marshal(data)
+		url := ""
+		contentType := "application/json;charset=utf-8"
+		body := bytes.NewBuffer(jsonData)
+		res, err := http.Post(url, contentType, body)
+		if res != nil{
+
+		}
 	}
-	if err != nil {
-		// TODO log
-	}
-	msg, _ := json.Marshal(Data)
-	res, err := http.PostForm(, msg)
+
 }
 
 func Add(w http.ResponseWriter, r *http.Request)  {
-	var getMessage Template.GetMessage
-	con, err := ioutil.ReadAll(r.Body)
-	if err != nil {
+	if !Api.CheckWhite(r.RemoteAddr) {
 		// TODO log
-	}
-	str := string(con)
-	if err := json.Unmarshal([]byte(str), &getMessage); err != nil {
-		// TODO log
-	}
-	// TODO find cache
-	addData, err:= Model.Find(getMessage.Uuid)
-	if err != nil {
-		// TODO log
-	}
-	data := Template.Data{
+	} else {
+		var addMessage Template.AddMessage
+		con, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			// TODO log
+		}
+		str := string(con)
+		if err := json.Unmarshal([]byte(str), &addMessage); err != nil {
+			// TODO log
+		}
+		// TODO find cache
+		addData, err:= Model.Find(addMessage.Uuid)
+		if err == nil {
+			// TODO log
+		} else {
+			size := int64(len([]byte(addMessage.Data)))
+			node, block, flag, _ := Api.Find(size)
+			storageData := Template.StorageData{
+				block,
+				Storage.StorageMap[node][block].RestOffset - size - 1,
+				Storage.StorageMap[node][block].RestOffset - 1,
+				flag,
+			}
+			jsonData, _ := json.Marshal(storageData)
+			url := ""
+			contentType := "application/json;charset=utf-8"
+			body := bytes.NewBuffer(jsonData)
+			res, err := http.Post( url, contentType, body)
+			if res != nil {
+
+			}
+		}
 
 	}
+
 
 }

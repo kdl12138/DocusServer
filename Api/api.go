@@ -10,7 +10,12 @@ import (
 	"strings"
 	"sync"
 )
+type Storages []Storage.StorageStruct
 
+func (a Storages) Len() int      { return len(a) }
+func (a Storages) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
+func (a Storages) Less(i, j int) bool { return a[i].RestMax > a[j].RestMax } // 从大到小排序
 func JsonReturn(w http.ResponseWriter, r *http.Request, module string, trace string, errNumber int, message string) {
 
 	// 返回Json数据格式
@@ -53,11 +58,21 @@ func Find(size int64 ) (node, block string, flag int, err error){
 	if size <= Storage.Storages[0].RestMax{
 		node = Storage.Storages[0].Node
 		block = Storage.Storages[0].Block
-		flag = 1 // TODO const
-
-		sort.Sort(Storage.Storages)
+		flag = Template.NewBlock_FALSE
+		Storage.Storages[0].RestMax -= size
+		Storage.Storages[0].RestOffset += size + 1
+		Storage.StorageMap[node][block] = Storage.Storage{
+			RestMax: Storage.Storages[0].RestMax,
+			RestOffset: Storage.Storages[0].RestOffset,
+		}
+		sort.Sort(Storages(Storage.Storages))
+		mux.Unlock()
+		return node, block, flag, err
+	} else {
+		flag = Template.NewBlock_TRUE
+		return "", "", flag, nil
 	}
 
 
-	return node, block, flag, err
+
 }
