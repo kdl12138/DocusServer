@@ -72,3 +72,24 @@ func Read(w http.ResponseWriter, r *http.Request){
 	msg, _ := json.Marshal(Data)
 	res, err := http.PostForm(, msg)
 }
+
+func Add(w http.ResponseWriter, r *http.Request)  {
+	var getMessage Template.GetMessage
+	con, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		// TODO log
+	}
+	str := string(con)
+	if err := json.Unmarshal([]byte(str), &getMessage); err != nil {
+		// TODO log
+	}
+	// TODO find cache
+	addData, err:= Model.Find(getMessage.Uuid)
+	if err != nil {
+		// TODO log
+	}
+	data := Template.Data{
+
+	}
+
+}

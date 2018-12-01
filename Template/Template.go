@@ -94,3 +94,5 @@ type MasterData struct {
 
 const Database string = "data"
 const DocusURL string = "var/docus/file/"
+const NewBlock_TRUE  = 1
+const NewBlock_FALSE  = 0
