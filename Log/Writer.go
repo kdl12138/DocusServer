@@ -1,0 +1,5 @@
+package Log
+
+func Write() {
+
+}
