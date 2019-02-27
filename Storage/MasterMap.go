@@ -12,6 +12,7 @@ type StorageStruct struct {
 	RestMax int64
 	RestOffset int64
 }
+// storage's map, use this to find the biggest free space
 var StorageMap map[string]map[string]Storage
 var Storages []StorageStruct
 func New()  {

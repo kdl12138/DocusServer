@@ -1,6 +1,8 @@
 package Api
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"git.docus.tech/kdl12138/DocusServer/Storage"
 	"git.docus.tech/kdl12138/DocusServer/Template"
@@ -9,6 +11,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"time"
 )
 type Storages []Storage.StorageStruct
 
@@ -51,10 +54,11 @@ func CheckWhite(r string) bool {
 	}
 	return false
 }
-
+// TODO fix bug
 func Find(size int64 ) (node, block string, flag int, err error){
 	var mux sync.Mutex
 	mux.Lock()
+	defer mux.Unlock()
 	if size <= Storage.Storages[0].RestMax{
 		node = Storage.Storages[0].Node
 		block = Storage.Storages[0].Block
@@ -66,11 +70,26 @@ func Find(size int64 ) (node, block string, flag int, err error){
 			RestOffset: Storage.Storages[0].RestOffset,
 		}
 		sort.Sort(Storages(Storage.Storages))
-		mux.Unlock()
 		return node, block, flag, err
 	} else {
 		flag = Template.NewBlock_TRUE
-		return "", "", flag, nil
+		block := md5.New()
+		block.Write([]byte(time.StampNano))
+		str := hex.EncodeToString(block.Sum(nil))
+		var f bool = true
+		for{
+			if(!f){
+				break
+			}
+			for _, k := range Storage.Storages {
+				if k.Block == str{
+					f = true
+					break
+				}
+				f = false
+			}
+		}
+		return "", str, flag, nil
 	}
 
 

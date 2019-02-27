@@ -11,7 +11,7 @@ var session *mgo.Session
 type SessionStore struct {
 	session *mgo.Session
 }
-
+// TODO safety
 func Init(dialinfo *mgo.DialInfo) {
 	var err error
 	session, err = mgo.DialWithInfo(dialinfo)
@@ -64,6 +64,9 @@ func Delete(name string) (err error) {
 	ds := NewSessionStore()
 	defer ds.Close()
 	con := ds.Connect(Template.Database)
+	if _, err := Find(name); err != nil{
+		return err
+	}
 	if err := con.Remove(bson.M{"uuid": name}); err != nil {
 		// TODO log
 	}
@@ -82,10 +85,14 @@ func Delete(name string) (err error) {
 	//	Md5:         tempData.Md5}
 	return nil
 }
-func Update(data Template.MasterData) (err error) {
+func Update(data Template.UpdataMessage) (err error) {
 	ds := NewSessionStore()
 	defer ds.Close()
 	con := ds.Connect(Template.Database)
+	if _, err := Find(data.Uuid); err != nil{
+		return err
+	}
+	// TODO storage
 	if err := con.Update(bson.M{"uuid": data.Uuid}, &data); err != nil {
 		// TODO log
 	}
