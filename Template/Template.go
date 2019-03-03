@@ -61,8 +61,8 @@ type AddMessage struct {
 	Md5       string `json:"md5"`       // md5
 }
 type Data struct {
-	Identity    string `json:"identity"`     // 身份
-	SessionId   string `json:"session"`      // session号
+	Identity  string `json:"identity"` // 身份
+	//SessionId string `json:"session"`  // session号
 	//Action      string `json:"action"`       // 方式
 	Uuid        string `json:"uuid"`         // 全局序号
 	Backup      int    `json:"backup"`       // 备份号
@@ -95,10 +95,13 @@ type StorageData struct {
 	Block       string `json:"block"`        // 所在区块
 	OffsetStart int64  `json:"offset_start"` // 偏移起点
 	OffsetEnd   int64  `json:"offset_end"`   // 偏移终点
-	flag        int    `json:"flag"`         // 是否开辟新的区块
+	Flag        int    `json:"flag"`         // 是否开辟新的区块
+	Data        string `json:"data"`         // 数据
 }
 
 const Database string = "data"
 const DocusURL string = "var/docus/file/"
 const NewBlock_TRUE = 1
 const NewBlock_FALSE = 0
+const STATUS_TRUE = 1
+const STATUS_FALSE  = 0

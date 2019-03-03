@@ -1,1 +1,14 @@
+{
+  "listen_address": "",
+  "listen_port": "",
+  "white_list": {
 
+  },
+  "gzip": "on",
+  "log-level": "0",
+  "log_dir": "",
+  "nodes": {
+
+  },
+  "identify": ""
+}
